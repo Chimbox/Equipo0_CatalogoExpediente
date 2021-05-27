@@ -5,14 +5,20 @@
  */
 package restService;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import equipo0_dominio.Paciente;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
+import negocios.FactoryNegocios;
+import negocios.INegociosExp;
 
 /**
  * REST Web Service
@@ -22,6 +28,8 @@ import javax.ws.rs.core.MediaType;
 @Path("exp")
 public class ExpedientesResource {
 
+    private final INegociosExp negocios;
+    
     @Context
     private UriInfo context;
 
@@ -29,27 +37,20 @@ public class ExpedientesResource {
      * Creates a new instance of ExpedientesResource
      */
     public ExpedientesResource() {
+        negocios=FactoryNegocios.getFachadaExpedientes();
+    
     }
-
-    /**
-     * Retrieves representation of an instance of restService.ExpedientesResource
-     * @return an instance of java.lang.String
-     */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getJson() {
-        String json="{"
-                + "\"expediente\":\"muerto\""
-                + "}";
-        return json;
-    }
-
-    /**
-     * PUT method for updating or creating an instance of ExpedientesResource
-     * @param content representation for the resource
-     */
-    @PUT
+    
+    @POST
+    @Path("/consultaexpediente")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void putJson(String content) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public String postConsultaExpediente(String json){
+        
+        Gson gson=new GsonBuilder().create();
+        
+        Paciente paciente=gson.fromJson(json, Paciente.class);
+        json=gson.toJson(negocios.consultarExpediente(paciente.getId()));
+        return json;
     }
 }
